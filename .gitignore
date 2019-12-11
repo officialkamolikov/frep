@@ -1,0 +1,12 @@
+*.obj
+*.exe
+*.user
+*.db
+.idea/
+.vs/
+
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+
+obj/
