@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <UserSecretsId>aspnet-frep-3697AAD9-A4FD-4729-86E9-692136961519</UserSecretsId>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <None Remove="frep\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DevExtreme.AspNet.Data" Version="2.6.0-rc1" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="frep\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="frep\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="frep\**" />
+      <Content Remove="Areas\Identity\Pages\_ValidationScriptsPartial.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="frep\Areas\Identity\Pages\_ViewStart.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Home\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Home\Privacy.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Shared\Error.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Shared\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Shared\_LoginPartial.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\Shared\_ValidationScriptsPartial.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\_ViewImports.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\Views\_ViewStart.cshtml" />
+      <_ContentIncludedByDefault Remove="frep\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="frep\appsettings.json" />
+      <_ContentIncludedByDefault Remove="frep\obj\frep.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="frep\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="frep\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="frep\Properties\launchSettings.json" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages.old\_ViewStart.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Management\AddDocument.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="files" />
+      <Folder Include="files_secured" />
+    </ItemGroup>
+
+</Project>
