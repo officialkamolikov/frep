@@ -33,7 +33,7 @@ namespace frep.Controllers
         public IActionResult Index()
         {
             var documents = _context.Documents.Where(doc => !doc.IsSecured).ToList();
-            ViewData["Title"] = "Открытая часть";
+            ViewData["Title"] = "Нормативно-правовые акты ФСБ";
             ViewData["Secured"] = false;
             return View("Table", documents);
         }
@@ -42,7 +42,7 @@ namespace frep.Controllers
         public IActionResult Privacy()
         {
             var documents = _context.Documents.Where(doc => doc.IsSecured).ToList();
-            ViewData["Title"] = "Закрытая часть";
+            ViewData["Title"] = "Документы ограниченного доступа";
             ViewData["Secured"] = true;
             return View("Table", documents);
         }
@@ -102,10 +102,12 @@ namespace frep.Controllers
                                  .Replace(" ", "_")
                                  .Replace(".", "_") + "_";
 
-
+            var nameCleared = name
+                .Replace(" ", "_")
+                .Replace("\"", "_");
             string path = isSecured
-                ? "\\files_secured\\" + dateString + name + ".pdf"
-                : "\\files\\" + dateString + name + ".pdf";
+                ? "\\files_secured\\" + dateString + nameCleared + ".pdf"
+                : "\\files\\" + dateString + nameCleared + ".pdf";
 
             try
             {
