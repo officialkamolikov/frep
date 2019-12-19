@@ -32,98 +32,127 @@ namespace frep.Controllers
 
         public IActionResult Index()
         {
-            var path = _appEnvironment.ContentRootPath + "\\files\\";
-            var files =  Directory.EnumerateFiles(path);
-            var filesList = new List<string>();
-            foreach (var file in files)
-            {
-                var parts = file.Split("\\");
-                filesList.Add(parts[^1]);
-            }
-            return View(filesList);
+            var documents = _context.Documents.Where(doc => !doc.IsSecured).ToList();
+            ViewData["Title"] = "Открытая часть";
+            ViewData["Secured"] = false;
+            return View("Table", documents);
         }
 
         [Authorize]
         public IActionResult Privacy()
         {
-            var path = _appEnvironment.ContentRootPath + "\\files_secured\\";
-            var files =  Directory.EnumerateFiles(path);
-            var filesList = new List<string>();
-            foreach (var file in files)
-            {
-                var parts = file.Split("\\");
-                filesList.Add(parts[^1]);
-            }
-            return View(filesList);
+            var documents = _context.Documents.Where(doc => doc.IsSecured).ToList();
+            ViewData["Title"] = "Закрытая часть";
+            ViewData["Secured"] = true;
+            return View("Table", documents);
         }
         
-        public IActionResult GetDocument(string fileName)
+        public IActionResult GetDocument(int id)
         {
-            string path = _appEnvironment.ContentRootPath + "\\files\\" + fileName;
-            try
-            {
-                return PhysicalFile(path, "application/pdf", fileName);
-            }
-            catch (Exception e)
-            {
-                return NotFound();
-            }
+            return GetDocumentInternal(id, false);
         }
         
         [Authorize]
-        public IActionResult GetSecuredDocument(string fileName)
+        public IActionResult GetSecuredDocument(int id)
         {
-            string path = _appEnvironment.ContentRootPath + "\\files_secured\\" + fileName;
-            try
-            {
-                return PhysicalFile(path, "application/pdf", fileName);
-            }
-            catch (Exception e)
-            {
-                return NotFound();
-            }
+            return GetDocumentInternal(id, true);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Authorize]
+        public ActionResult AddDocument()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            ViewData["Method"] = "AddDocument";
+            return View("DocumentAddition");
         }
-
         
         [Authorize]
         public ActionResult AddSecureDocument()
         {
-            return View();
+            ViewData["Method"] = "AddSecureDocument";
+            return View("DocumentAddition");
         }
-
+        
         [Authorize]
         [HttpPost]
-        public ActionResult AddSecureDocument(IFormFile selectedFile)
+        public ActionResult AddDocument(IFormFile selectedFile, string name, string category)
         {
-            var realFileName = (selectedFile.FileName.Split('\\'))[^1];
-            string path = "\\files_secured\\" + realFileName;
-            
-            if (!realFileName.Contains("pdf"))
+            ViewData["Method"] = "AddDocument";
+            return AddFile(selectedFile, name, category, false);
+        }
+        
+        [Authorize]
+        [HttpPost]
+        public ActionResult AddSecureDocument(IFormFile selectedFile, string name, string category)
+        {
+            ViewData["Method"] = "AddSecureDocument";
+            return AddFile(selectedFile, name, category, true);
+        }
+
+        private ActionResult AddFile(IFormFile selectedFile, string name, string category, bool isSecured)
+        {
+            if (!(selectedFile.FileName.Split('\\'))[^1].Contains("pdf"))
             {
                 ViewData["Message"] = "Поддерживаются только файлы pdf";
-                return View();
+                return View("DocumentAddition");
             }
+            
+            var date = DateTime.Now;
+            var dateString = date.ToString()
+                                 .Replace(":", "_")
+                                 .Replace(" ", "_")
+                                 .Replace(".", "_") + "_";
+
+
+            string path = isSecured
+                ? "\\files_secured\\" + dateString + name + ".pdf"
+                : "\\files\\" + dateString + name + ".pdf";
 
             try
             {
+                var newDocument = new Document { Name = name, Category = category, Path = path, DateAdd = date, IsSecured = isSecured };
+                _context.Documents.Add(newDocument);
+                _context.SaveChanges();
+
                 using (var fileStream = new FileStream(_appEnvironment.ContentRootPath + path, FileMode.Create))
                 {
                     selectedFile.CopyTo(fileStream);
-                    ViewData["Message"] = "Файл успешно загружен";
-                    return View();
                 }
+
+                ViewData["Message"] = "Файл успешно загружен";
+                return View("DocumentAddition");
             }
-            catch (Exception e)
+            catch
             {
                 ViewData["Message"] = "Произошла ошибка при загрузке файла";
-                return View();
+                return View("DocumentAddition");
             }
+        }
+
+        private ActionResult GetDocumentInternal(int id, bool secured)
+        {
+            var doc = _context.Documents.FirstOrDefault(x => x.Id == id);
+            if (doc.IsSecured != secured)
+            {
+                return NotFound();
+            }
+            if (doc != null)
+            {
+                try
+                {
+                    return PhysicalFile(_appEnvironment.ContentRootPath + doc.Path, "application/pdf", doc.Name + ".pdf");
+                }
+                catch (Exception e)
+                {
+                    return NotFound();
+                }
+            }
+            return NotFound();
+        }
+        
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

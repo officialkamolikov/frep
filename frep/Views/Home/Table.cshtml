@@ -1,0 +1,91 @@
+﻿@using System.Text.Json
+
+@model List<Document>;
+<script>
+     var filesList = @Html.Raw(
+                         JsonSerializer.Serialize(@Model.Select(x => new {id = x.Id.ToString(), name = x.Name, category = x.Category, dateAdd = x.DateAdd.ToString
+                         ("dd/MM/yyyy")})
+                             .ToArray()));
+    
+     function mapDocument(files) {
+         if (files.length > 0) {
+             var secured = @ViewData["Secured"].ToString().ToLower();
+             var list = $("#list").empty();
+             var table = $('<table>', {class: "table"});
+             var tr = $('<tr>');
+             $('<th>', {text: "Идентификатор"}).appendTo(tr);
+             $('<th>', {text: "Имя"}).appendTo(tr);
+             $('<th>', {text: "Категория"}).appendTo(tr);
+             $('<th>', {text: "Дата добавления"}).appendTo(tr);
+             $('<th>', {text: "Ссылка"}).appendTo(tr);
+             tr.appendTo(table);
+             files.forEach(
+                 (i) => {
+                     var tr = $('<tr>');
+                     $('<td>', {text: i.id}).appendTo(tr);
+                     $('<td>', {text: i.name}).appendTo(tr);
+                     $('<td>', {text: i.category}).appendTo(tr);
+                     $('<td>', {text: i.dateAdd}).appendTo(tr);
+                     var linkTd = $('<td>');
+                     $('<a>', {text: "Скачать", href: (secured ? "/Home/GetSecuredDocument/" : "/Home/GetDocument/") + i.id}).appendTo(linkTd);
+                     linkTd.appendTo(tr);
+                     tr.appendTo(table);
+                 });
+             table.appendTo(list);             
+         }
+         else {
+             var list = $("#list").empty().text("Список пока пуст");
+         }
+         
+     }
+     
+     function searchDocument() {
+         var idSearchData = $('#idSearch').val();
+         var nameSearchData = $('#nameSearch').val();
+         var categorySearchData = $('#categorySearch').val();
+         
+         console.log(idSearchData);
+         console.log(nameSearchData);
+         console.log(categorySearchData);
+         
+         var docs = filesList.filter(x => x.id.includes(idSearchData));
+         var docs = docs.filter(x => x.name.includes(nameSearchData));
+         var docs = docs.filter(x => x.category.includes(categorySearchData));
+         
+         mapDocument(docs);
+     }
+     
+     $(x => {mapDocument(filesList)});
+    
+</script>
+<h1>
+    <span class="align-top">
+        @ViewData["Title"]
+    </span>
+    
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a class="btn btn-primary float-right align-top" asp-controller="Home" asp-action="@((bool) ViewData["Secured"] ? "AddSecureDocument" : "AddDocument")">Загрузка документа</a>
+    }
+</h1>
+
+<div id="search">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>
+                    <input id="idSearch" type="text" class="form-control" placeholder="поиск по id" oninput="searchDocument()"/>
+                </td>
+                <td>
+                    <input id="nameSearch" type="text" class="form-control" placeholder="поиск по имени" oninput="searchDocument()"/>
+                </td>
+                <td>
+                    <input id="categorySearch" type="text" class="form-control" placeholder="поиск по категории" oninput="searchDocument()"/>
+                </td>
+                <td></td><td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="list"></div>

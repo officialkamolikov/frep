@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
+using frep.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace frep.Data
 {
@@ -12,5 +16,7 @@ namespace frep.Data
             : base(options)
         {
         }
+        
+        public virtual DbSet<Document> Documents { get; set; }
     }
 }

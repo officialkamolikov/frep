@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Добавление документа";
+}
+
+<h1>@ViewData["Title"]</h1>
+<form Controller="Home" asp-action=@ViewData["Method"] method="post" enctype="multipart/form-data">
+    <div>@ViewData["Message"]</div>
+    
+    <div class="input-group">
+        <label class="custom-file-label" for="selectFile">Выберите файл</label>
+        <input class="custom-file-input" id="selectFile" name="selectedFile" type="file" required/>
+    </div>
+    
+    <label class="mt-2" for="name">Введите название</label>
+    <div class="input-group">
+        <input class="form-control" id="name" name="name" type="text" required/>
+    </div>
+    <label class="mt-1" for="category">Введите категорию</label>
+    <div class="input-group">
+        <input class="form-control" id="category" name="category" type="text" required/>
+    </div>
+    <button class="btn btn-primary mt-2" type="submit">Загрузить</button>
+</form>
+
+
+
